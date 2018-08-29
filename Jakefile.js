@@ -3,12 +3,23 @@
     'use strict';
     const semver = require('semver');
     const jshint = require('simplebuild-jshint');
-
+    /**
+     General Purpose Tasks
+     **/
     desc('Default task');
     task('default', ['version', 'lint'], () => {
         process.stdout.write('\nBUILD OK\n');
     });
 
+    desc('Run a localhost server');
+    task('run', () => {
+        jake.exec('node ./node_modules/http-server/bin/http-server src', {interactive: true}, complete);
+    }, {async: true});
+
+
+    /**
+     Supporting Tasks
+     **/
     desc('Check Node version');
     task('version', () => {
         process.stdout.write('\nChecking Node version\n');
@@ -21,10 +32,10 @@
     });
 
     desc('Lint Javascript Code');
-    process.stdout.write('\nLinting Javascript code\n');
     task('lint', () => {
+        process.stdout.write('\nLinting Javascript code\n');
         jshint.checkFiles({
-            files: 'Jakefile.js',
+            files: ['Jakefile.js', 'src/**/*.js'],
             options: {
                 curly: true,
                 eqeqeq: true,
