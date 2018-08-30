@@ -1,4 +1,4 @@
-/* globals jake: false, desc: false, fail: false, complete: false, task: false */
+/* globals jake: false, desc: false, fail: false, complete: false, task: false, directory: false */
 
 (() => {
     'use strict';
@@ -36,6 +36,7 @@
     };
 
     const KARMA_CONFIG = 'karma.conf.js';
+    const DIST_DIR = 'generated/dist';
 
 
     desc('Start Karma Server');
@@ -53,8 +54,8 @@
     });
 
     desc('Run a localhost server');
-    task('run', () => {
-        jake.exec('./node_modules/http-server/bin/http-server src', {interactive: true}, complete);
+    task('run', ['build'], () => {
+        jake.exec('./node_modules/http-server/bin/http-server ' + DIST_DIR, {interactive: true}, complete);
     }, {async: true});
 
     desc('Run tests');
@@ -91,4 +92,19 @@
             globals: globals
         }, complete, fail);
     }, {async: true});
+
+    desc('Build dist directory');
+    task('build', [DIST_DIR], () => {
+        process.stdout.write('\nBuilding dist directory\n');
+
+
+    });
+
+    desc('Erase all generated files');
+    task('clean', () => {
+       process.stdout.write('\nErasing generated files\n');
+
+    });
+
+    directory(DIST_DIR);
 })();
