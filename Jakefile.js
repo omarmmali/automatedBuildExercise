@@ -4,6 +4,7 @@
     'use strict';
     const semver = require('semver');
     const jshint = require('simplebuild-jshint');
+    const karma = require('simplebuild-karma');
 
     const lintOptions = {
         curly: true,
@@ -34,14 +35,39 @@
         afterEach: false
     };
 
+    const KARMA_CONFIG = 'karma.conf.js';
+
+
+    desc('Start Karma Server');
+    task('karma', () => {
+        process.stdout.write('\nStarting Karma Server\n');
+
+        karma.start({
+            configFile: KARMA_CONFIG
+        }, complete, fail);
+    }, {async: true});
+
     desc('Default task');
-    task('default', ['version', 'lint'], () => {
+    task('default', ['version', 'lint', 'test'], () => {
         process.stdout.write('\nBUILD OK\n');
     });
 
     desc('Run a localhost server');
     task('run', () => {
-        jake.exec('node ./node_modules/http-server/bin/http-server src', {interactive: true}, complete);
+        jake.exec('./node_modules/http-server/bin/http-server src', {interactive: true}, complete);
+    }, {async: true});
+
+    desc('Run tests');
+    task('test', () => {
+        process.stdout.write('\nRunning Javascript tests\n');
+
+        karma.run({
+            configFile: KARMA_CONFIG,
+            expectedBrowsers: [
+                'Chrome 68.0.3440 (Mac OS X 10.13.6)'
+            ],
+            strict: process.env.strict !== 'false'
+        }, complete, fail);
     }, {async: true});
 
     desc('Check Node version');
@@ -65,5 +91,4 @@
             globals: globals
         }, complete, fail);
     }, {async: true});
-
 })();
