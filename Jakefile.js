@@ -1,10 +1,11 @@
-/* globals jake: false, desc: false, fail: false, complete: false, task: false, directory: false */
+/* globals jake: false, desc: false, fail: false, complete: false, task: false, directory: false, rm: false, cp: false, require:false */
 
 (() => {
     'use strict';
     const semver = require('semver');
     const jshint = require('simplebuild-jshint');
     const karma = require('simplebuild-karma');
+    const shell = require('shelljs');
 
     const lintOptions = {
         curly: true,
@@ -32,7 +33,8 @@
         before: false,
         after: false,
         beforeEach: false,
-        afterEach: false
+        afterEach: false,
+        require: false
     };
 
     const KARMA_CONFIG = 'karma.conf.js';
@@ -55,6 +57,7 @@
 
     desc('Run a localhost server');
     task('run', ['build'], () => {
+        console.log(DIST_DIR);
         jake.exec('./node_modules/http-server/bin/http-server ' + DIST_DIR, {interactive: true}, complete);
     }, {async: true});
 
@@ -97,13 +100,22 @@
     task('build', [DIST_DIR], () => {
         process.stdout.write('\nBuilding dist directory\n');
 
+        shell.rm('-rf', DIST_DIR + '/*');
 
-    });
+        shell.cp('./src/index.html', DIST_DIR);
+
+        jake.exec(
+            `node node_modules/browserify/bin/cmd.js ./src/app.js -o ${DIST_DIR}/bundle.js`,
+            {interactive: true},
+            complete
+        );
+    }, {async: true});
 
     desc('Erase all generated files');
     task('clean', () => {
-       process.stdout.write('\nErasing generated files\n');
+        process.stdout.write('\nErasing generated files\n');
 
+        shell.rm('-rf', 'generated');
     });
 
     directory(DIST_DIR);

@@ -1,5 +1,7 @@
 (() => {
+    'use strict';
+
     const addition = require('./addition');
 
-    console.log(addition.add(42, 13));
+    console.log(addition.add(50, 13));
 })();
